@@ -79,6 +79,20 @@ class App extends Component {
     });
   }
 
+  setToday = () => {
+    this.setState({ 
+      currentDate: new Date(), 
+      datePicked: true
+    });
+  };
+
+  clear = () => {
+    this.setState({
+      currentDate: new Date(),
+      datePicked: false
+    })
+  }
+
   render() {
 
     const myCalendar = calendarBuilder(this.state.currentDate);
@@ -149,6 +163,8 @@ class App extends Component {
 
         <button onClick={this.monthUp}>Increase Month</button>
         <button onClick={this.monthDown}>Decrease Month</button>
+        <button onClick={this.setToday}>Today</button>
+        <button onClick={this.clear}>Clear</button>
       </div>
     );
   }
