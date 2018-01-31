@@ -1,62 +1,37 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import moment from 'moment';
 
-import calendarBuilder, { htmlCalendar } from 'CalendarBuilder';
+import calendarBuilder, { htmlCalendar, CONSTANTS } from 'calendar-builder';
+const { FULL_MONTHS, ABRV_MONTHS } = CONSTANTS;
 
 
+const myMoment = moment();
+console.log(myMoment);
 
-// const myCalendar = CalendarBuilder.data(new Date());
-// console.log(myCalendar)
+const newDatePicker = calendarBuilder(myMoment);
+console.log(newDatePicker);
 
-export const FULL_MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
-];
-
-export const ABRV_MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sept',
-  'Oct',
-  'Nov',
-  'Dec'
-];
 
 
 class App extends Component {
 
   state = {
-    currentDate: new Date(),
-    datePicked: false
+    currentDate: moment(),
+    pickedDate: undefined
   }
 
   monthUp = () => {
     this.setState((prev) => {
-      const newDate = new Date(prev.currentDate.getFullYear(), prev.currentDate.getMonth() + 1);
+      const newDate = moment(prev.currentDate.add(1, 'month'));
       return { currentDate: newDate };
     });
   }
 
   monthDown = () => {
     this.setState((prev) => {
-      const newDate = new Date(prev.currentDate.getFullYear(), prev.currentDate.getMonth() - 1);
+      const newDate = moment(prev.currentDate.add(-1, 'month'));
       return { currentDate: newDate };
     });
   }
@@ -64,39 +39,46 @@ class App extends Component {
   updateMonth = (e) => {
     const target = e.target.value;
     this.setState((prev) => {
-      const newDate = new Date(prev.currentDate.getFullYear(), ABRV_MONTHS.indexOf(target), prev.currentDate.getDate());
+      const newDate = prev.currentDate.clone().month(target);
       return { currentDate: newDate };
     });
   }
 
   clickDate = (date) => {
     this.setState((prev) => {
-      const newDate = new Date(prev.currentDate.getFullYear(), prev.currentDate.getMonth(), date);
+      const newDate = prev.currentDate.clone().date(date);
       return { 
-        datePicked: true,
-        currentDate: newDate
+        pickedDate: newDate
       };
     });
   }
 
   setToday = () => {
-    this.setState({ 
-      currentDate: new Date(), 
-      datePicked: true
+    this.setState(() => { 
+      const today = moment();
+      return {
+        pickedDate: today,
+        currentDate: today, 
+        datePicked: true
+      };
     });
   };
 
   clear = () => {
-    this.setState({
-      currentDate: new Date(),
-      datePicked: false
-    })
+    this.setState(() => {
+      return {
+        pickedDate: undefined,
+        datePicked: false
+      };
+    });
   }
 
   render() {
 
-    const myCalendar = calendarBuilder(this.state.currentDate);
-    const { currentDate, datePicked } = this.state;
+    const myCalendar = calendarBuilder(this.state.currentDate, {
+      startDay: 'Sunday'
+    });
+    const { currentDate, pickedDate } = this.state;
 
     return (
       <div className="App">
@@ -106,10 +88,10 @@ class App extends Component {
         </header>
         <br /> 
           { 
-            datePicked && <p>Picked Date { myCalendar.month } { currentDate.getDate() }, { myCalendar.year }</p> 
+            pickedDate && <p>Picked Date { pickedDate.format('MMMM') } { pickedDate.date() }, { pickedDate.year() }</p> 
           }
           {
-            !datePicked && <p>Please pick a date</p>
+            !pickedDate && <p>Please pick a date</p>
           }
         <br />
         <table>
